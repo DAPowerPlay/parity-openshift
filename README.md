@@ -46,6 +46,8 @@ oc process parity-openshift | oc create -f -
 
 ### OpenShift template - The GUI Way
 
+If you don't have your OpenShift instance, register an account on RedHats [OpenShift Online](https://manage.openshift.com/).
+
 
 ![alt text][r1]
 
