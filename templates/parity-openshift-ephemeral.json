@@ -6,7 +6,7 @@
       "annotations":{
          "openshift.io/display-name":"Parity (Ephemeral)",
          "description":"An Ethereum Parity node running on centos (Ephemeral)",
-         "iconClass":"fa-ethereum",
+         "iconClass":"fa fa-ethereum",
          "openshift.io/provider-display-name":"Digital Assets Power Play Limited",
          "openshift.io/documentation-url":"https://github.com/dapowerplay/parity-openshift",
          "openshift.io/support-url":"https://ww.dapowerplay.com",
@@ -180,15 +180,13 @@
             },
             "tags":[
                {
-                  "name":"dapowerplay/parity:1.9.5-centos",
+                  "name":"1.9.5-centos",
                   "from":{
                      "kind":"DockerImage",
                      "name":"dapowerplay/parity:1.9.5-centos"
                   },
                   "generation":2,
-                  "importPolicy":{
-
-                  }
+                  "importPolicy":{}
                }
             ]
          }
