@@ -23,9 +23,7 @@
     {
       "name": "CHAIN",
       "displayName": "Chain",
-      "description": "Specify the blockchain type. CHAIN may be either a JSON chain specification
-        file or olympic, frontier, homestead, mainnet, morden, ropsten, classic,
-        expanse, musicoin, ellaism, testnet, kovan or dev.",
+      "description": "Specify the blockchain type. CHAIN may be either a JSON chain specification file or olympic, frontier, homestead, mainnet, morden, ropsten, classic, expanse, musicoin, ellaism, testnet, kovan or dev.",
       "value": "dev",
       "required": true
     },
