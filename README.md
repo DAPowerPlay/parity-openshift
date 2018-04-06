@@ -54,7 +54,7 @@ oc process parity-openshift | oc create -f -
 
 ![alt text][r2]
 
-`Either c/p the [Parity Openshift template](/templates/parity-openshift-ephemeral.json) or click Browse and upload the file.`
+`Either c/p the Parity Openshift template or click Browse and upload the file.`
 
 
 ![alt text][r3]
