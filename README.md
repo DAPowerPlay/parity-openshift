@@ -1,6 +1,6 @@
 # parity-openshift
 
-This repository contains Docker [Parity](https://www.parity.io/) image based on [CentOS](https://www.centos.org/) and [OpenShift](https://www.openshift.com/) template based on that image.
+This repository contains Docker [Parity](https://www.parity.io/) image based on [CentOS](https://www.centos.org/) alongside [OpenShift](https://www.openshift.com/) template based on that image.
 
 ## How to use this image
 
