@@ -126,7 +126,7 @@
          "spec":{
             "host":"${APPLICATION_HOSTNAME}",
             "port":{
-               "targetPort":"8180-tcp"
+               "targetPort":"8545-tcp"
             },
             "selector":{
                "deploymentconfig":"${APPLICATION_NAME}"
@@ -195,5 +195,6 @@
             ]
          }
       }
-   ]
+   ],
+   "message" : "Congrats! ${APPLICATION_NAME} is starting the ${CHAIN} chain in ${BASE_PATH}."
 }
