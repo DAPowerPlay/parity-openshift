@@ -1,4 +1,5 @@
 FROM centos:7.4.1708
+MAINTAINER DPP <contact@dapowerplay.com>
 
 LABEL maintainer="dapowerplay.eth"
 
