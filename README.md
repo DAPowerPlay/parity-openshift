@@ -53,7 +53,11 @@ Once your Openshift project is ready, check out [GUI guidelines](/assets/GUIWAY.
 
 :link::link::link:
 
-Built on :fire:OpenShift:fire: and :fire:Parity:fire: 
+Built on 
+
+:fire:OpenShift:fire: 
+
+:fire:Parity:fire: 
 
 Happy Coding!
 
