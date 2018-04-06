@@ -6,7 +6,7 @@
       "annotations":{
          "openshift.io/display-name":"Parity (Ephemeral)",
          "description":"An Ethereum Parity node running on centos (Ephemeral)",
-         "iconClass":"fa-ethereum",
+         "iconClass":"fa fa-link",
          "openshift.io/provider-display-name":"Digital Assets Power Play Limited",
          "openshift.io/documentation-url":"https://github.com/dapowerplay/parity-openshift",
          "openshift.io/support-url":"https://github.com/dapowerplay/parity-openshift/issues",
