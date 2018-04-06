@@ -100,13 +100,9 @@
         "selector": {
           "name": "${APPLICATION_NAME}"
         },
-        "triggers": [
-          {
-            "type": "ConfigChange"
-          }
-        ],
+        "triggers": [],
         "strategy": {
-          "type": "Rolling"
+          "type": "Recreate"
         }
       }
     },
@@ -186,7 +182,6 @@
                     "openshift.io/display-name": "Parity",
                     "description": "Build and deploy Parity Ethereum node",
                     "iconClass": "icon-ethereum",
-                    "sampleRepo": "https://github.com/dapowerplay/parity-openshift.git",
                     "tags": "parity, ethereum, protocol, node",
                     "version": "1.9.5-centos"
                 },
