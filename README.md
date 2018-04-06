@@ -1,4 +1,4 @@
-a![repotag][tag] ![license][license] ![dockerpulls][dockerpulls]
+![repotag][tag] ![license][license] ![dockerpulls][dockerpulls]
 # parity-openshift
 
 This repository contains **non-root** Docker [Parity](https://www.parity.io/) image based on [CentOS](https://www.centos.org/) alongside with [OpenShift](https://www.openshift.com/) template based on that image.
