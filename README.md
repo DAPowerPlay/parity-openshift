@@ -1,12 +1,12 @@
 # parity-openshift
 
-This repository contains Docker [Parity](https://www.parity.io/) image based on [CentOS](https://www.centos.org/) alongside [OpenShift](https://www.openshift.com/) template based on that image.
+This repository contains **non-root** Docker [Parity](https://www.parity.io/) image based on [CentOS](https://www.centos.org/) alongside [OpenShift](https://www.openshift.com/) template based on that image.
 
 ## How to use this Docker image
 
 ### Install
 
-Install the container:
+Install the image:
 
 ```
 docker pull dapowerplay/parity
@@ -19,6 +19,12 @@ docker pull dapowerplay/parity:1.9.5-centos
 ```
 
 ### Usage
+
+Start Parity container in working directory:
+
+```
+docker run -d dapowerplay/parity:1.9.5-centos --base-path=.
+``````
 
 ## How to use this OpenShift template
 
