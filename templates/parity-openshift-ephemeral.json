@@ -182,15 +182,13 @@
             },
             "tags":[
                {
-                  "name":"dapowerplay/parity:1.9.5-centos",
+                  "name":"1.9.5-centos",
                   "from":{
                      "kind":"DockerImage",
                      "name":"dapowerplay/parity:1.9.5-centos"
                   },
                   "generation":2,
-                  "importPolicy":{
-
-                  }
+                  "importPolicy":{}
                }
             ]
          }
