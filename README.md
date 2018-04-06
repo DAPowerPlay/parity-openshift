@@ -52,6 +52,7 @@ If you don't have your OpenShift instance, register an account on RedHats [OpenS
 Once your Openshift project is ready, check out [GUI guidelines](/assets/GUIWAY.md) to run Parity and get access to Ethereum network on OpenShift. 
 
 :link::link::link:
+
 Built on :fire:OpenShift:fire: and :fire:Parity:fire: 
 
 Happy Coding!
