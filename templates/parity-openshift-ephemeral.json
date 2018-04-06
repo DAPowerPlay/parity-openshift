@@ -179,12 +179,12 @@
             "generation": 2,
             "importPolicy": {},
             "annotations": {
-                    "openshift.io/display-name": "Parity",
-                    "description": "Build and deploy Parity Ethereum node",
-                    "iconClass": "icon-ethereum",
-                    "tags": "parity, ethereum, protocol, node",
-                    "version": "1.9.5-centos"
-                },
+              "openshift.io/display-name": "Parity",
+              "description": "Build and deploy Parity Ethereum node",
+              "iconClass": "icon-ethereum",
+              "tags": "parity, ethereum, protocol, node",
+              "version": "1.9.5-centos"
+            }
           }
         ]
       }
