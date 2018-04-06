@@ -1,190 +1,199 @@
 {
-  "apiVersion": "v1",
-  "kind": "Template",
-  "metadata": {
-    "name": "parity-openshift",
-    "annotations": {
-      "description": "An Ethereum Parity node running on centos (Ephemeral)",
-      "iconClass": "icon-parity",
-      "tags": "parity, ethereum, protocol, node"
-    }
-  },
-  "labels": {
-    "createdBy": "dapowerplay.eth"
-  },
-  "parameters": [
-    {
-      "name": "APPLICATION_NAME",
-      "displayName": "A name for this project",
-      "description": "Give this project a name",
-      "value": "my-parity-openshift",
-      "required": true
-    },
-    {
-      "name": "CHAIN",
-      "displayName": "Chain",
-      "description": "Specify the blockchain type. CHAIN may be either a JSON chain specification file or olympic, frontier, homestead, mainnet, morden, ropsten, classic, expanse, musicoin, ellaism, testnet, kovan or dev.",
-      "value": "dev",
-      "required": true
-    },
-    {
-      "name": "BASE_PATH",
-      "displayName": "Base path",
-      "description": "Base path for Parity",
-      "value": "/opt/parity",
-      "required": true
-    },
-    {
-      "name": "REPLICA_COUNT",
-      "description": "Number of replicas to run",
-      "value": "1",
-      "required": true
-    },
-    {
-      "name": "APPLICATION_HOSTNAME",
-      "description": "Custom hostname for parity service routes. Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>"
-    }
-  ],
-  "objects": [
-    {
-      "kind": "DeploymentConfig",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "${APPLICATION_NAME}"
+   "apiVersion":"v1",
+   "kind":"Template",
+   "metadata":{
+      "name":"parity-openshift",
+      "annotations":{
+         "openshift.io/display-name":"Parity (Ephemeral)",
+         "description":"An Ethereum Parity node running on centos (Ephemeral)",
+         "iconClass":"fa fa-link",
+         "openshift.io/provider-display-name":"Digital Assets Power Play Limited",
+         "openshift.io/documentation-url":"https://github.com/dapowerplay/parity-openshift",
+         "openshift.io/support-url":"https://github.com/dapowerplay/parity-openshift/issues",
+         "tags":"parity, ethereum, protocol, node"
+      }
+   },
+   "labels":{
+      "createdBy":"dapowerplay.eth"
+   },
+   "parameters":[
+      {
+         "name":"APPLICATION_NAME",
+         "displayName":"A name for this project",
+         "description":"Give this project a name",
+         "value":"my-parity-openshift",
+         "required":true
       },
-      "spec": {
-        "template": {
-          "metadata": {
-            "labels": {
-              "name": "${APPLICATION_NAME}"
-            }
-          },
-          "spec": {
-            "containers": [
-              {
-                "name": "${APPLICATION_NAME}",
-                "image": "dapowerplay/parity:1.9.5-centos",
-                "args": [
-                  "--config",
-                  "${BASE_PATH}/mounts/config/config.toml"
-                ],
-                "ports": [
-                  {
-                    "name": "8545-tcp",
-                    "containerPort": 8545,
-                    "protocol": "TCP"
+      {
+         "name":"CHAIN",
+         "displayName":"Chain",
+         "description":"Specify the blockchain type. CHAIN may be either a JSON chain specification file or olympic, frontier, homestead, mainnet, morden, ropsten, classic, expanse, musicoin, ellaism, testnet, kovan or dev.",
+         "value":"dev",
+         "required":true
+      },
+      {
+         "name":"BASE_PATH",
+         "displayName":"Base path",
+         "description":"Base path for Parity",
+         "value":"/opt/parity",
+         "required":true
+      },
+      {
+         "name":"REPLICA_COUNT",
+         "description":"Number of replicas to run",
+         "value":"1",
+         "required":true
+      },
+      {
+         "name":"APPLICATION_HOSTNAME",
+         "description":"Custom hostname for parity service routes. Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>"
+      }
+   ],
+   "objects":[
+      {
+         "kind":"DeploymentConfig",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${APPLICATION_NAME}"
+         },
+         "spec":{
+            "template":{
+               "metadata":{
+                  "labels":{
+                     "name":"${APPLICATION_NAME}"
                   }
-                ],
-                "volumeMounts": [
-                  {
-                    "mountPath": "${BASE_PATH}/mounts/config",
-                    "name": "config-volume-${APPLICATION_NAME}"
-                  }
-                ]
-              }
-            ],
-            "volumes": [
-              {
-                "name": "config-volume-${APPLICATION_NAME}",
-                "configMap": {
-                  "defaultMode": 420,
-                  "name": "${APPLICATION_NAME}-config"
-                }
-              }
-            ],
-            "restartPolicy": "Always",
-            "dnsPolicy": "ClusterFirst"
-          }
-        },
-        "replicas": "${REPLICA_COUNT}",
-        "selector": {
-          "name": "${APPLICATION_NAME}"
-        },
-        "triggers": [
-          {
-            "type": "ConfigChange"
-          }
-        ],
-        "strategy": {
-          "type": "Rolling"
-        }
-      }
-    },
-    {
-      "kind": "Route",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "${APPLICATION_NAME}-rpc",
-        "annotations": {
-          "description": "Route for Parity JSON-RPC"
-        }
-      },
-      "spec": {
-        "host": "${APPLICATION_HOSTNAME}",
-        "port": {
-          "targetPort": "8180-tcp"
-        },
-        "selector": {
-          "deploymentconfig": "${APPLICATION_NAME}"
-        },
-        "to": {
-          "kind": "Service",
-          "name": "${APPLICATION_NAME}"
-        }
-      }
-    },
-    {
-      "kind": "Service",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "${APPLICATION_NAME}"
-      },
-      "spec": {
-        "ports": [
-          {
-            "name": "8545-tcp",
-            "protocol": "TCP",
-            "port": 8545,
-            "targetPort": 8545
-          }
-        ],
-        "selector": {
-          "deploymentconfig": "${APPLICATION_NAME}"
-        }
-      }
-    },
-    {
-      "kind": "ConfigMap",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "${APPLICATION_NAME}-config"
-      },
-      "data": {
-        "config.toml": "[parity]\nchain = \"${CHAIN}\"\nbase_path = \"${BASE_PATH}\"\n"
-      }
-    },
-    {
-      "kind": "ImageStream",
-      "apiVersion": "v1",
-      "metadata": {
-        "name": "${APPLICATION_NAME}"
-      },
-      "spec": {
-        "lookupPolicy": {
-          "local": false
-        },
-        "tags": [
-          {
-            "from": {
-              "kind": "DockerImage",
-              "name": "dapowerplay/parity:1.9.5-centos"
+               },
+               "spec":{
+                  "containers":[
+                     {
+                        "name":"${APPLICATION_NAME}",
+                        "image":"dapowerplay/parity:1.9.5-centos",
+                        "args":[
+                           "--config",
+                           "${BASE_PATH}/mounts/config/config.toml"
+                        ],
+                        "ports":[
+                           {
+                              "name":"8545-tcp",
+                              "containerPort":8545,
+                              "protocol":"TCP"
+                           }
+                        ],
+                        "volumeMounts":[
+                           {
+                              "mountPath":"${BASE_PATH}/mounts/config",
+                              "name":"config-volume-${APPLICATION_NAME}"
+                           }
+                        ]
+                     }
+                  ],
+                  "volumes":[
+                     {
+                        "name":"config-volume-${APPLICATION_NAME}",
+                        "configMap":{
+                           "defaultMode":420,
+                           "name":"${APPLICATION_NAME}-config"
+                        }
+                     }
+                  ],
+                  "restartPolicy":"Always",
+                  "dnsPolicy":"ClusterFirst"
+               }
             },
-            "generation": 2,
-            "importPolicy": {},
-            "name": "dapowerplay/parity:1.9.5-centos"
-          }
-        ]
+            "replicas":"${REPLICA_COUNT}",
+            "selector":{
+               "name":"${APPLICATION_NAME}"
+            },
+            "triggers":[
+               {
+                  "type":"ConfigChange"
+               }
+            ],
+            "strategy":{
+               "type":"Recreate"
+            }
+         }
+      },
+      {
+         "kind":"Route",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${APPLICATION_NAME}-rpc",
+            "annotations":{
+               "description":"Route for Parity JSON-RPC"
+            }
+         },
+         "spec":{
+            "host":"${APPLICATION_HOSTNAME}",
+            "port":{
+               "targetPort":"8545-tcp"
+            },
+            "selector":{
+               "deploymentconfig":"${APPLICATION_NAME}"
+            },
+            "to":{
+               "kind":"Service",
+               "name":"${APPLICATION_NAME}",
+               "weight": 100
+            }
+         }
+      },
+      {
+         "kind":"Service",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${APPLICATION_NAME}"
+         },
+         "spec":{
+            "ports":[
+               {
+                  "name":"8545-tcp",
+                  "protocol":"TCP",
+                  "port":8545,
+                  "targetPort":8545
+               }
+            ],
+            "selector":{
+               "deploymentconfig":"${APPLICATION_NAME}"
+            }
+         }
+      },
+      {
+         "kind":"ConfigMap",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${APPLICATION_NAME}-config"
+         },
+         "data":{
+            "config.toml":"[parity]\nchain = \"${CHAIN}\"\nbase_path = \"${BASE_PATH}\"\n\n[rpc]\ninterface = \"all\"\nhosts = [\"all\"]\napis = [\"all\"]\ncors = [\"all\"]\nport = 8545\n"
+         }
+      },
+      {
+         "kind":"ImageStream",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${APPLICATION_NAME}"
+         },
+         "spec":{
+            "selector":{
+               "deploymentconfig":"${APPLICATION_NAME}"
+            },
+            "lookupPolicy":{
+               "local":false
+            },
+            "tags":[
+               {
+                  "name":"1.9.5-centos",
+                  "from":{
+                     "kind":"DockerImage",
+                     "name":"dapowerplay/parity:1.9.5-centos"
+                  },
+                  "generation":2,
+                  "importPolicy":{}
+               }
+            ]
+         }
       }
-    }
-  ]
+   ],
+   "message" : "Congrats! ${APPLICATION_NAME} is starting the ${CHAIN} chain in ${BASE_PATH}."
 }
