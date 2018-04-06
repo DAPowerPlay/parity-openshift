@@ -9,7 +9,7 @@
          "iconClass":"fa fa-ethereum",
          "openshift.io/provider-display-name":"Digital Assets Power Play Limited",
          "openshift.io/documentation-url":"https://github.com/dapowerplay/parity-openshift",
-         "openshift.io/support-url":"https://ww.dapowerplay.com",
+         "openshift.io/support-url":"https://github.com/dapowerplay/parity-openshift/issues",
          "tags":"parity, ethereum, protocol, node"
       }
    },
@@ -105,7 +105,9 @@
                "name":"${APPLICATION_NAME}"
             },
             "triggers":[
-
+               {
+                  "type":"ConfigChange"
+               }
             ],
             "strategy":{
                "type":"Recreate"
@@ -124,7 +126,7 @@
          "spec":{
             "host":"${APPLICATION_HOSTNAME}",
             "port":{
-               "targetPort":"8180-tcp"
+               "targetPort":"8545-tcp"
             },
             "selector":{
                "deploymentconfig":"${APPLICATION_NAME}"
@@ -191,5 +193,6 @@
             ]
          }
       }
-   ]
+   ],
+   "message" : "Congrats! ${APPLICATION_NAME} is starting the ${CHAIN} chain in ${BASE_PATH}."
 }
