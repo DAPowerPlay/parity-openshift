@@ -5,7 +5,7 @@
     "name": "parity-openshift",
     "annotations": {
       "description": "An Ethereum Parity node running on centos (Ephemeral)",
-      "iconClass": "icon-parity",
+      "iconClass": "icon-ethereum",
       "tags": "parity, ethereum, protocol, node"
     }
   },
@@ -175,13 +175,21 @@
         },
         "tags": [
           {
+            "name": "dapowerplay/parity:1.9.5-centos",
             "from": {
               "kind": "DockerImage",
               "name": "dapowerplay/parity:1.9.5-centos"
             },
             "generation": 2,
             "importPolicy": {},
-            "name": "dapowerplay/parity:1.9.5-centos"
+            "annotations": {
+                    "openshift.io/display-name": "Parity",
+                    "description": "Build and deploy Parity Ethereum node",
+                    "iconClass": "icon-ethereum",
+                    "sampleRepo": "https://github.com/dapowerplay/parity-openshift.git",
+                    "tags": "parity, ethereum, protocol, node",
+                    "version": "1.9.5-centos"
+                },
           }
         ]
       }
