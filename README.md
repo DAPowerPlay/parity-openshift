@@ -1,5 +1,5 @@
-![license][license] 
-[![Pulls](https://shields.beevelop.com/docker/pulls/dapowerplay/parity.svg?style=flat-square)](https://hub.docker.com/r/dapowerplay/parity/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) 
+[![Pulls](https://shields.beevelop.com/docker/pulls/dapowerplay/parity.svg)](https://hub.docker.com/r/dapowerplay/parity/)
 # parity-openshift
 
 This repository contains **non-root** Docker [Parity](https://www.parity.io/) image based on [CentOS](https://www.centos.org/) alongside with [OpenShift](https://www.openshift.com/) template based on that image.
@@ -59,6 +59,4 @@ Once your Openshift project is ready, check out [GUI guidelines](/assets/GUIWAY.
 
 Happy Coding! :fire:          :fire_engine:
 
-[license]: https://img.shields.io/github/license/DAPowerPlay/parity-openshift.svg
-[dockerpulls]: https://img.shields.io/docker/pulls/dapowerplay/parity.svg
 
