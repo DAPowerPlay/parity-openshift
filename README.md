@@ -1,4 +1,4 @@
-![repotag][tag] ![license][license] ![dockerpulls][dockerpulls]
+![license][license] ![dockerpulls][dockerpulls]
 # parity-openshift
 
 This repository contains **non-root** Docker [Parity](https://www.parity.io/) image based on [CentOS](https://www.centos.org/) alongside with [OpenShift](https://www.openshift.com/) template based on that image.
@@ -58,7 +58,6 @@ Once your Openshift project is ready, check out [GUI guidelines](/assets/GUIWAY.
 
 Happy Coding! :fire:          :fire_engine:
 
-[tag]: 	https://img.shields.io/github/license/DAPowerPlay/parity-openshift.svg
 [license]: https://img.shields.io/github/license/DAPowerPlay/parity-openshift.svg
 [dockerpulls]: https://img.shields.io/docker/pulls/dapowerplay/parity.svg
 
