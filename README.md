@@ -4,6 +4,13 @@
 
 This repository contains **non-root** Docker [Parity](https://www.parity.io/) image based on [CentOS](https://www.centos.org/) alongside with [OpenShift](https://www.openshift.com/) template based on that image.
 
+## How to use this OpenShift template - The GUI Way
+
+Run a Parity Ethereum node on OpenShift for free in just a few clicks:
+
+1) If you don't have your OpenShift instance, register an account on RedHats [OpenShift Online](https://manage.openshift.com/).
+2) Once your Openshift project is ready, check out [GUI guidelines](/assets/GUIWAY.md) to run Parity and get access to Ethereum network on OpenShift. 
+
 ## How to use this Docker image
 
 ### Install
@@ -46,11 +53,6 @@ Generate API object from template:
 oc process parity-openshift | oc create -f -
 ```
 
-### OpenShift template - The GUI Way
-
-If you don't have your OpenShift instance, register an account on RedHats [OpenShift Online](https://manage.openshift.com/).
-
-Once your Openshift project is ready, check out [GUI guidelines](/assets/GUIWAY.md) to run Parity and get access to Ethereum network on OpenShift. 
 
 *"Creation is always an act of collaboration."*
 
