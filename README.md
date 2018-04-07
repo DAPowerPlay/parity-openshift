@@ -1,5 +1,5 @@
 ![license][license] 
-[![Pulls](https://shields.beevelop.com/docker/pulls/beevelop/shields.svg?style=flat-square)](https://hub.docker.com/r/dapowerplay/parity/)
+[![Pulls](https://shields.beevelop.com/docker/pulls/dapowerplay/parity.svg?style=flat-square)](https://hub.docker.com/r/dapowerplay/parity/)
 # parity-openshift
 
 This repository contains **non-root** Docker [Parity](https://www.parity.io/) image based on [CentOS](https://www.centos.org/) alongside with [OpenShift](https://www.openshift.com/) template based on that image.
