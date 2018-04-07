@@ -58,7 +58,7 @@ Once your Openshift project is ready, check out [GUI guidelines](/assets/GUIWAY.
 
 Happy Coding! :fire:          :fire_engine:
 
-[tag]: 	https://img.shields.io/github/tag/dapowerplay/openshift-parity.svg
-[license]: https://img.shields.io/github/license/dapowerplay/openshift-parity.svg
+[tag]: 	https://img.shields.io/github/license/DAPowerPlay/parity-openshift.svg
+[license]: https://img.shields.io/github/license/DAPowerPlay/parity-openshift.svg
 [dockerpulls]: https://img.shields.io/docker/pulls/dapowerplay/parity.svg
 
