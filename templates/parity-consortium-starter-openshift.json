@@ -1,0 +1,320 @@
+{
+   "apiVersion":"v1",
+   "kind":"Template",
+   "metadata":{
+      "name":"parity-consortium-starter-openshift",
+      "annotations":{
+         "openshift.io/display-name":"Parity Consortium Starter",
+         "description":"An Ethereum Parity node running on centos with some sugar prepared for a Consortium PoA network",
+         "iconClass":"fa fa-link",
+         "openshift.io/provider-display-name":"Digital Assets Power Play Limited",
+         "openshift.io/documentation-url":"https://github.com/dapowerplay/parity-openshift",
+         "openshift.io/support-url":"https://github.com/dapowerplay/parity-openshift/issues",
+         "tags":"parity, ethereum, protocol, node"
+      }
+   },
+   "labels":{
+      "createdBy":"dapowerplay.eth"
+   },
+   "parameters":[
+      {
+         "name":"CONSORTIUM_NAME",
+         "displayName":"A name for this consortium",
+         "description":"Give this consortium a name. No spaces, only lowercase letters or numbers or -.",
+         "value":"consortium-dpp-alpha",
+         "required":true
+      },
+      {
+         "name":"NETWORK_ID",
+         "displayName":"Network id",
+         "description":"Defines the id of your private ethereum network",
+         "value":"0xfafadeadbeef",
+         "required":true   
+      },
+      {
+         "name":"BLOCK_REWARD",
+         "displayName":"Block Reward",
+         "description":"Defines reward per block",
+         "value":"0x2B992DDFA23249D6",
+         "required":true
+      },
+      {
+         "name":"STEP_DURATION",
+         "displayName":"Step Duration",
+         "value":"4",
+         "required":true
+      },
+      {
+         "name":"REPLICA_COUNT",
+         "displayName":"Secondary replica count",
+         "description":"Number of secondary replicas to run",
+         "value":"1",
+         "required":true
+      },
+      {
+         "name":"VALIDATOR_IDENTITY",
+         "displayName":"Validator identity",
+         "value":"validator-1",
+         "description":"Identity for the validator node",
+         "required":true
+      },
+      {
+         "name":"ENGINE_SIGNER",
+         "displayName":"Engine signer",
+         "value" : "0x6906F4a9F35C92a0C375Cf93Dea0a46C1F860Bf1",
+         "description":"public key of the for the validator",
+         "required":true
+      },
+      {
+         "name":"APPLICATION_HOSTNAME_WS",
+         "description":"Custom hostname for parity service routes. Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>"
+      },
+      {
+         "name":"APPLICATION_HOSTNAME_RPC",
+         "description":"Custom hostname for parity service routes. Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>"
+      }
+   ],
+   "objects":[
+      {
+         "kind":"DeploymentConfig",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-validator"
+         },
+         "spec":{
+            "template":{
+               "metadata":{
+                  "labels":{
+                     "name":"${CONSORTIUM_NAME}-validator"
+                  }
+               },
+               "spec":{
+                  "containers":[
+                     {
+                        "name":"${CONSORTIUM_NAME}-validator-container",
+                        "image":"dapowerplay/parity:1.9.5-centos",
+                        "args":[
+                           "--config",
+                           "/opt/parity/mounts/config/config-validator.toml"
+                        ],
+                        "ports":[
+                           {
+                              "name":"8545-tcp",
+                              "containerPort":8545,
+                              "protocol":"TCP"
+                           },{
+                              "name":"8546-tcp",
+                              "containerPort":8546,
+                              "protocol":"TCP"
+                           }
+                        ],
+                        "volumeMounts":[
+                           {
+                              "mountPath":"/opt/parity/mounts/config",
+                              "name":"config-validator-volume-${CONSORTIUM_NAME}"
+                           },
+                           {
+                              "mountPath":"/opt/parity/mounts/genesis",
+                              "name":"genesis-volume-${CONSORTIUM_NAME}"
+                           },
+                           {
+                              "mountPath":"/opt/parity/mounts/reserved",
+                              "name":"consortium-reserved-peers-${CONSORTIUM_NAME}"
+                           },
+                           {
+                              "mountPath":"/opt/parity/mounts/pwds",
+                              "name":"consortium-validator-pwd-${CONSORTIUM_NAME}"
+                           }
+                        ]
+                     }
+                  ],
+                  "volumes":[
+                     {
+                        "name":"config-validator-volume-${CONSORTIUM_NAME}",
+                        "configMap":{
+                           "defaultMode":420,
+                           "name":"${CONSORTIUM_NAME}-config-validator"
+                        }
+                     },
+                     {
+                        "name":"genesis-volume-${CONSORTIUM_NAME}",
+                        "configMap":{
+                           "defaultMode":420,
+                           "name":"${CONSORTIUM_NAME}-consortium-genesis"
+                        }
+                     },
+                     {
+                        "name":"consortium-reserved-peers-${CONSORTIUM_NAME}",
+                        "configMap":{
+                           "defaultMode":420,
+                           "name":"${CONSORTIUM_NAME}-consortium-reserved-peers"
+                        }
+                     },
+                     {
+                        "name":"consortium-validator-pwd-${CONSORTIUM_NAME}",
+                        "configMap":{
+                           "defaultMode":420,
+                           "name":"${CONSORTIUM_NAME}-consortium-validator-pwd"
+                        }
+                     }
+                  ],
+                  "restartPolicy":"Always",
+                  "dnsPolicy":"ClusterFirst"
+               }
+            },
+            "replicas":"1",
+            "selector":{
+               "name":"${CONSORTIUM_NAME}-validator"
+            },
+            "triggers":[
+               {
+                  "type":"ConfigChange"
+               }
+            ],
+            "strategy":{
+               "type":"Recreate"
+            }
+         }
+      },
+      {
+         "kind":"Route",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-rpc",
+            "annotations":{
+               "description":"Route for Parity JSON-RPC"
+            }
+         },
+         "spec":{
+            "host":"${APPLICATION_HOSTNAME_RPC}",
+            "port":{
+               "targetPort":"8545-tcp"
+            },
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-validator"
+            },
+            "to":{
+               "kind":"Service",
+               "name":"${CONSORTIUM_NAME}-validator-service",
+               "weight": 100
+            }
+         }
+      },
+      {
+         "kind":"Route",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-ws",
+            "annotations":{
+               "description":"Route for Parity Websocket"
+            }
+         },
+         "spec":{
+            "host":"${APPLICATION_HOSTNAME_WS}",
+            "port":{
+               "targetPort":"8546-tcp"
+            },
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-validator"
+            },
+            "to":{
+               "kind":"Service",
+               "name":"${CONSORTIUM_NAME}-validator-service",
+               "weight": 100
+            }
+         }
+      },
+      {
+         "kind":"Service",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-validator-service"
+         },
+         "spec":{
+            "ports":[
+               {
+                  "name":"8545-tcp",
+                  "protocol":"TCP",
+                  "port":8545,
+                  "targetPort":8545
+               },{
+                  "name":"8546-tcp",
+                  "protocol":"TCP",
+                  "port":8546,
+                  "targetPort":8546
+               }
+            ],
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-validator"
+            }
+         }
+      },
+      {
+         "kind":"ConfigMap",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-config-validator"
+         },
+         "data":{
+            "config-validator.toml":"[parity]\nchain = \"/opt/parity/mounts/genesis/consortium-genesis.json\"\nbase_path = \"/opt/parity/data\"\n identity = \"${VALIDATOR_IDENTITY}\"\nlight = false\n\n[network]\nport = 30301\nmin_peers = 0\nmax_peers = 999\ndiscovery = true\nreserved_only = false\nreserved_peers = \"/opt/parity/mounts/reserved/peers.enodes\"\n\n[ui]\ndisable = true\n\n[dapps]\ndisable = true\n\n[secretstore]\ndisable = true\n\n[websockets]\ninterface = \"all\"\norigins = [\"all\"]\nhosts = [\"all\"]\napis = [\"all\"]\nport = 8546\n\n[rpc]\ninterface = \"all\"\nhosts = [\"all\"]\napis = [\"all\"]\ncors = [\"all\"]\nport = 8545\n\n\n[account]\npassword = [\"/opt/parity/mounts/pwds/validator.pwd\"]\n\n[mining]\n#engine_signer = \"${ENGINE_SIGNER}\"\n#reseal_on_txs = \"none\"\n\n"
+         }
+      },
+      {
+         "kind":"ConfigMap",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-consortium-genesis"
+         },
+         "data":{
+            "consortium-genesis.json":"{\n    \"name\": \"${CONSORTIUM_NAME}\",\n    \"engine\":\n    {\n        \"authorityRound\":\n        {\n            \"params\":\n            {\n                \"stepDuration\": \"${STEP_DURATION}\",\n                \"blockReward\": \"${BLOCK_REWARD}\",\n                \"validators\":\n                {\n                    \"multi\":\n                    {\n                        \"0\":\n                        {\n                            \"list\": [\n                                \"${ENGINE_SIGNER}\"\n                            ]\n                        }\n                    }\n                },\n                \"maximumUncleCountTransition\": 1,\n                \"maximumUncleCount\": 0,\n                \"validateScoreTransition\": 1,\n                \"validateStepTransition\": 1\n            }\n        }\n    },\n    \"params\":\n    {\n        \"maximumExtraDataSize\": \"0xff\",\n     \n        \"minGasLimit\": \"0x1388\",\n        \"gasLimitBoundDivisor\": \"0x0400\",\n        \"networkID\": \"${NETWORK_ID}\",\n        \"emptyStepsTransition\" : 1,\n        \"validateReceiptsTransition\": 1,\n        \"eip155Transition\": 1,\n        \"validateChainIdTransition\": 1,\n        \"eip140Transition\": 1,\n        \"eip211Transition\": 1,\n        \"eip214Transition\": 1,\n        \"eip658Transition\": 1\n    },\n    \"genesis\":\n    {\n        \"seal\":\n        {\n            \"authorityRound\":\n            {\n                \"step\": \"0x0\",\n                \"signature\": \"0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000abcd\"\n            }\n        },\n        \"difficulty\": \"0x20000\",\n        \"gasLimit\": \"0xfffD80\"\n    },\n    \"accounts\":\n    {\n        \"0x0000000000000000000000000000000000000001\":\n        {\n            \"balance\": \"1\",\n            \"builtin\":\n            {\n                \"name\": \"ecrecover\",\n                \"pricing\":\n                {\n                    \"linear\":\n                    {\n                        \"base\": 3000,\n                        \"word\": 0\n                    }\n                }\n            }\n        },\n        \"0x0000000000000000000000000000000000000002\":\n        {\n            \"balance\": \"1\",\n            \"builtin\":\n            {\n                \"name\": \"sha256\",\n                \"pricing\":\n                {\n                    \"linear\":\n                    {\n                        \"base\": 60,\n                        \"word\": 12\n                    }\n                }\n            }\n        },\n        \"0x0000000000000000000000000000000000000003\":\n        {\n            \"balance\": \"1\",\n            \"builtin\":\n            {\n                \"name\": \"ripemd160\",\n                \"pricing\":\n                {\n                    \"linear\":\n                    {\n                        \"base\": 600,\n                        \"word\": 120\n                    }\n                }\n            }\n        },\n        \"0x0000000000000000000000000000000000000004\":\n        {\n            \"balance\": \"1\",\n            \"builtin\":\n            {\n                \"name\": \"identity\",\n                \"pricing\":\n                {\n                    \"linear\":\n                    {\n                        \"base\": 15,\n                        \"word\": 3\n                    }\n                }\n            }\n        },\n        \"0x0000000000000000000000000000000000000005\":\n        {\n            \"builtin\":\n            {\n                \"name\": \"modexp\",\n                \"activate_at\": 1,\n                \"pricing\":\n                {\n                    \"modexp\":\n                    {\n                        \"divisor\": 20\n                    }\n                }\n            }\n        },\n        \"0x0000000000000000000000000000000000000006\":\n        {\n            \"builtin\":\n            {\n                \"name\": \"alt_bn128_add\",\n                \"activate_at\": 1,\n                \"pricing\":\n                {\n                    \"linear\":\n                    {\n                        \"base\": 500,\n                        \"word\": 0\n                    }\n                }\n            }\n        },\n        \"0x0000000000000000000000000000000000000007\":\n        {\n            \"builtin\":\n            {\n                \"name\": \"alt_bn128_mul\",\n                \"activate_at\": 1,\n                \"pricing\":\n                {\n                    \"linear\":\n                    {\n                        \"base\": 40000,\n                        \"word\": 0\n                    }\n                }\n            }\n        },\n        \"0x0000000000000000000000000000000000000008\":\n        {\n            \"builtin\":\n            {\n                \"name\": \"alt_bn128_pairing\",\n                \"activate_at\": 1,\n                \"pricing\":\n                {\n                    \"alt_bn128_pairing\":\n                    {\n                        \"base\": 100000,\n                        \"pair\": 80000\n                    }\n                }\n            }\n        }\n    },\n    \"nodes\": []\n}"
+         }
+      },
+      {
+         "kind":"ConfigMap",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-consortium-reserved-peers"
+         },
+         "data":{
+            "peers.enodes":"\n"
+         }
+      },
+      {
+         "kind":"ConfigMap",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-consortium-validator-pwd"
+         },
+         "data":{
+            "validator.pwd":"c4 f0 44 33 46 4e c8 af cb 2a 71 46 e9 3a 25 fb\n"
+         }
+      },
+      {
+         "kind":"ImageStream",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}"
+         },
+         "spec":{
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-validator"
+            },
+            "lookupPolicy":{
+               "local":false
+            },
+            "tags":[
+               {
+                  "name":"1.9.5-centos",
+                  "from":{
+                     "kind":"DockerImage",
+                     "name":"dapowerplay/parity:1.9.5-centos"
+                  },
+                  "generation":2,
+                  "importPolicy":{}
+               }
+            ]
+         }
+      }
+   ],
+   "message" : "Congrats! ${CONSORTIUM_NAME} is starting."
+}
