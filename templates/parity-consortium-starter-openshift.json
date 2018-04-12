@@ -94,8 +94,8 @@
          "value": "QVN0cm9uZ1Bhc3N3b3Jk"
       },
       {
-         "description": "Validator keystore",
-         "displayName": "Base64 encoded keystore file for the validator account, will be stored as a secret.",
+         "displayName": "Validator keystore",
+         "description": "Base64 encoded keystore file for the validator account, will be stored as a secret.",
          "name": "VALIDATOR_KEY",
          "required": true,
          "value": "eyJ2ZXJzaW9uIjozLCJpZCI6ImYyZGZhYTJhLTU2MmYtNDRkMy04NTI2LTg1NmFmM2Q3MTM2MCIsImFkZHJlc3MiOiI1ODExYmUwM2MwYTRlNWNiMzdkOGRlMWE5Y2Q0MDFlODg2Yzk4OGQ5IiwiQ3J5cHRvIjp7ImNpcGhlcnRleHQiOiJjNTQwOGUwYmFkYTg4ZTliMjBjZjI1NDI3NGU3ZWQ4NDRhMTczMmE4NDRiNzUyODk2NTg1NjA3NTZiYWFmZmRlIiwiY2lwaGVycGFyYW1zIjp7Iml2IjoiMjE1NzkzMDYzOGEzYmI4NDNkNGE2ZTRhNWVjODllZDcifSwiY2lwaGVyIjoiYWVzLTEyOC1jdHIiLCJrZGYiOiJzY3J5cHQiLCJrZGZwYXJhbXMiOnsiZGtsZW4iOjMyLCJzYWx0IjoiZjY3M2YxMDA5NTJiZjM5MWFjN2E0Yjk0MGM4OTk3YTg4MWEyOWFiOGY5OGIzNDczNzYzMThkYjlkNjViOTc1MiIsIm4iOjgxOTIsInIiOjgsInAiOjF9LCJtYWMiOiI4NGRjZmRhZGI5NzE2YjYzOGUzODViNWNlYTk0MmIzMDFiNzQ4N2ZiNDVkZTE0YzA5OGM5NzNjYTUwOTE3MGEyIn19"
@@ -357,6 +357,74 @@
          }
       },
       {
+         "kind":"DeploymentConfig",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-el"
+         },
+         "spec":{
+            "template":{
+               "metadata":{
+                  "labels":{
+                     "name":"${CONSORTIUM_NAME}-el"
+                  }
+               },
+               "spec":{
+                  "containers":[
+                     {
+                        "name":"${CONSORTIUM_NAME}-el-container",
+                        "image":"dapowerplay/el:0.1.0-rhel",
+                        "ports":[
+                           {
+                              "name":"3000-tcp",
+                              "containerPort":3000,
+                              "protocol":"TCP"
+                           }
+                        ],
+                        "env": [
+                           {
+                              "name": "WEB3_HTTP_PROVIDER",
+                              "value": "http://${CONSORTIUM_NAME}-secondary-service:8545"
+                           }
+                        ],
+                        "resources": {
+                        },
+                        "volumeMounts":[
+                           {
+                              "mountPath":"/names",
+                              "name":"el-${CONSORTIUM_NAME}"
+                           }
+                        ]
+                     }
+                  ],
+                  "volumes":[
+                     {
+                        "name":"el-${CONSORTIUM_NAME}",
+                        "configMap":{
+                           "defaultMode":420,
+                           "name":"${CONSORTIUM_NAME}-el"
+                        }
+                     }
+                  ],
+                  "restartPolicy":"Always",
+                  "dnsPolicy":"ClusterFirst"
+               }
+            },
+            "replicas":"1",
+            "selector":{
+               "name":"${CONSORTIUM_NAME}-el"
+            },
+            "triggers":[
+               {
+                  "type":"ConfigChange"
+               }
+            ],
+            "strategy":{
+               "type":"Recreate"
+            }
+         }
+      },
+      {
          "kind":"Route",
          "apiVersion":"v1",
          "metadata":{
@@ -400,6 +468,30 @@
             "to":{
                "kind":"Service",
                "name":"${CONSORTIUM_NAME}-validator-service",
+               "weight": 100
+            }
+         }
+      },
+      {
+         "kind":"Route",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-el",
+            "annotations":{
+               "description":"Route for Explorer"
+            }
+         },
+         "spec":{
+            "host":"",
+            "port":{
+               "targetPort":"3000-tcp"
+            },
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-el"
+            },
+            "to":{
+               "kind":"Service",
+               "name":"${CONSORTIUM_NAME}-el-service",
                "weight": 100
             }
          }
@@ -513,6 +605,26 @@
          }
       },
       {
+         "kind":"Service",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-el-service"
+         },
+         "spec":{
+            "ports":[
+               {
+                  "name":"3000-tcp",
+                  "protocol":"TCP",
+                  "port":3000,
+                  "targetPort":3000
+               }
+            ],
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-el"
+            }
+         }
+      },
+      {
          "kind":"ConfigMap",
          "apiVersion":"v1",
          "metadata":{
@@ -551,8 +663,7 @@
          "data":{
             "peers.enodes":"\n"
          }
-      },
-      {
+      },{
          "apiVersion": "v1",
          "kind": "Secret",
          "metadata": {
@@ -560,6 +671,15 @@
          },
          "data": {
             "key": "${VALIDATOR_KEY}"
+         }
+      },{
+         "apiVersion": "v1",
+         "kind": "ConfigMap",
+         "metadata": {
+            "name": "${CONSORTIUM_NAME}-el"
+         },
+         "data": {
+            "names.json": "{\n     \"0x5811Be03C0A4E5cB37d8de1a9cd401E886c988D9\" : \"${VALIDATOR_IDENTITY}\"\n}"
          }
       },
       {
@@ -617,6 +737,32 @@
                   "from":{
                      "kind":"DockerImage",
                      "name":"dapowerplay/parity:1.9.5-centos"
+                  },
+                  "generation":2,
+                  "importPolicy":{}
+               }
+            ]
+         }
+      },
+      {
+         "kind":"ImageStream",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-el"
+         },
+         "spec":{
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-el"
+            },
+            "lookupPolicy":{
+               "local":false
+            },
+            "tags":[
+               {
+                  "name":"dapowerplay/el:0.1.0-rhel",
+                  "from":{
+                     "kind":"DockerImage",
+                     "name":"dapowerplay/el:0.1.0-rhel"
                   },
                   "generation":2,
                   "importPolicy":{}
