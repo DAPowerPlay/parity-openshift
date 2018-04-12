@@ -48,7 +48,7 @@
          "name":"REPLICA_COUNT",
          "displayName":"Secondary replica count",
          "description":"Number of secondary replicas to run",
-         "value":"1",
+         "value":"3",
          "required":true
       },
       {
@@ -61,20 +61,80 @@
       {
          "name":"ENGINE_SIGNER",
          "displayName":"Engine signer",
-         "value" : "0x6906F4a9F35C92a0C375Cf93Dea0a46C1F860Bf1",
-         "description":"public key of the for the validator",
+         "value" : "0x5811Be03C0A4E5cB37d8de1a9cd401E886c988D9",
+         "description":"public key of the first validator that will start the chain",
          "required":true
       },
       {
-         "name":"APPLICATION_HOSTNAME_WS",
+         "description": "Volume space available for Validator ethereum node, e.g. 512Mi, 2Gi.",
+         "displayName": "Volume Capacity",
+         "name": "VALIDATOR_VOLUME_CAPACITY",
+         "required": true,
+         "value": "1Gi"
+      },
+      {
+         "description": "Maximum amount of memory the Secondary containers can use.",
+         "displayName": "Secondary Memory Limit",
+         "name": "SECONDARY_MEMORY_LIMIT",
+         "required": true,
+         "value": "512Mi"
+      },
+      {
+         "description": "Maximum amount of memory the Validator container can use.",
+         "displayName": "Validator Memory Limit",
+         "name": "VALIDATOR_MEMORY_LIMIT",
+         "required": true,
+         "value": "512Mi"
+      },
+      {
+         "description": "Base64 encoded keystore password for the validator account, will be stored as a secret.",
+         "displayName": "Validator keystore password",
+         "name": "VALIDATOR_KEY_PASSWORD",
+         "required": true,
+         "value": "QVN0cm9uZ1Bhc3N3b3Jk"
+      },
+      {
+         "description": "Validator keystore",
+         "displayName": "Base64 encoded keystore file for the validator account, will be stored as a secret.",
+         "name": "VALIDATOR_KEY",
+         "required": true,
+         "value": "eyJ2ZXJzaW9uIjozLCJpZCI6ImYyZGZhYTJhLTU2MmYtNDRkMy04NTI2LTg1NmFmM2Q3MTM2MCIsImFkZHJlc3MiOiI1ODExYmUwM2MwYTRlNWNiMzdkOGRlMWE5Y2Q0MDFlODg2Yzk4OGQ5IiwiQ3J5cHRvIjp7ImNpcGhlcnRleHQiOiJjNTQwOGUwYmFkYTg4ZTliMjBjZjI1NDI3NGU3ZWQ4NDRhMTczMmE4NDRiNzUyODk2NTg1NjA3NTZiYWFmZmRlIiwiY2lwaGVycGFyYW1zIjp7Iml2IjoiMjE1NzkzMDYzOGEzYmI4NDNkNGE2ZTRhNWVjODllZDcifSwiY2lwaGVyIjoiYWVzLTEyOC1jdHIiLCJrZGYiOiJzY3J5cHQiLCJrZGZwYXJhbXMiOnsiZGtsZW4iOjMyLCJzYWx0IjoiZjY3M2YxMDA5NTJiZjM5MWFjN2E0Yjk0MGM4OTk3YTg4MWEyOWFiOGY5OGIzNDczNzYzMThkYjlkNjViOTc1MiIsIm4iOjgxOTIsInIiOjgsInAiOjF9LCJtYWMiOiI4NGRjZmRhZGI5NzE2YjYzOGUzODViNWNlYTk0MmIzMDFiNzQ4N2ZiNDVkZTE0YzA5OGM5NzNjYTUwOTE3MGEyIn19"
+      },
+      {
+         "name":"VALIDATOR_HOSTNAME_WS",
          "description":"Custom hostname for parity service routes. Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>"
       },
       {
-         "name":"APPLICATION_HOSTNAME_RPC",
+         "name":"VALIDATOR_HOSTNAME_RPC",
+         "description":"Custom hostname for parity service routes. Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>"
+      },
+      {
+         "name":"SECONDARY_HOSTNAME_WS",
+         "description":"Custom hostname for parity service routes. Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>"
+      },
+      {
+         "name":"SECONDARY_HOSTNAME_RPC",
          "description":"Custom hostname for parity service routes. Leave blank for default hostname, e.g.: <application-name>.<project>.<default-domain-suffix>"
       }
    ],
    "objects":[
+        {
+            "apiVersion": "v1",
+            "kind": "PersistentVolumeClaim",
+            "metadata": {
+                "name": "${CONSORTIUM_NAME}-validator-claim"
+            },
+            "spec": {
+                "accessModes": [
+                    "ReadWriteOnce"
+                ],
+                "resources": {
+                    "requests": {
+                        "storage": "${VALIDATOR_VOLUME_CAPACITY}"
+                    }
+                }
+            }
+        },
       {
          "kind":"DeploymentConfig",
          "apiVersion":"v1",
@@ -106,8 +166,17 @@
                               "name":"8546-tcp",
                               "containerPort":8546,
                               "protocol":"TCP"
+                           },{
+                              "name":"30301-udp",
+                              "containerPort":30301,
+                              "protocol":"UDP"
                            }
                         ],
+                        "resources": {
+                           "limits": {
+                              "memory": "${VALIDATOR_MEMORY_LIMIT}"
+                           }
+                        },
                         "volumeMounts":[
                            {
                               "mountPath":"/opt/parity/mounts/config",
@@ -122,8 +191,16 @@
                               "name":"consortium-reserved-peers-${CONSORTIUM_NAME}"
                            },
                            {
-                              "mountPath":"/opt/parity/mounts/pwds",
-                              "name":"consortium-validator-pwd-${CONSORTIUM_NAME}"
+                              "mountPath": "/opt/parity/data",
+                              "name": "${CONSORTIUM_NAME}-validator-data"
+                           }, 
+                           {
+                              "mountPath": "/opt/parity/data/keys/${CONSORTIUM_NAME}",
+                              "name": "${CONSORTIUM_NAME}-secret-volume-key"
+                           }, 
+                           {
+                              "mountPath": "/opt/parity/mounts/pwd",
+                              "name": "${CONSORTIUM_NAME}-secret-volume-pwd"
                            }
                         ]
                      }
@@ -151,10 +228,19 @@
                         }
                      },
                      {
-                        "name":"consortium-validator-pwd-${CONSORTIUM_NAME}",
-                        "configMap":{
-                           "defaultMode":420,
-                           "name":"${CONSORTIUM_NAME}-consortium-validator-pwd"
+                       "name": "${CONSORTIUM_NAME}-validator-data",
+                         "persistentVolumeClaim": {
+                            "claimName": "${CONSORTIUM_NAME}-validator-claim"
+                         }
+                     },{
+                        "name": "${CONSORTIUM_NAME}-secret-volume-key",
+                        "secret": {
+                           "secretName": "${CONSORTIUM_NAME}-consortium-validator-key"
+                        }
+                     },{
+                        "name": "${CONSORTIUM_NAME}-secret-volume-pwd",
+                        "secret": {
+                           "secretName": "${CONSORTIUM_NAME}-consortium-validator-pwd"
                         }
                      }
                   ],
@@ -175,18 +261,112 @@
                "type":"Recreate"
             }
          }
+      },{
+         "kind":"DeploymentConfig",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-secondary"
+         },
+         "spec":{
+            "template":{
+               "metadata":{
+                  "labels":{
+                     "name":"${CONSORTIUM_NAME}-secondary"
+                  }
+               },
+               "spec":{
+                  "containers":[
+                     {
+                        "name":"${CONSORTIUM_NAME}-secondary-container",
+                        "image":"dapowerplay/parity:1.9.5-centos",
+                        "args":[
+                           "--config",
+                           "/opt/parity/mounts/config/config-secondary.toml"
+                        ],
+                        "ports":[
+                           {
+                              "name":"8545-tcp",
+                              "containerPort":8545,
+                              "protocol":"TCP"
+                           },{
+                              "name":"8546-tcp",
+                              "containerPort":8546,
+                              "protocol":"TCP"
+                           }
+                        ],
+                        "resources": {
+                           "limits": {
+                              "memory": "${SECONDARY_MEMORY_LIMIT}"
+                           }
+                        },
+                        "volumeMounts":[
+                           {
+                              "mountPath":"/opt/parity/mounts/config",
+                              "name":"config-secondary-volume-${CONSORTIUM_NAME}"
+                           },
+                           {
+                              "mountPath":"/opt/parity/mounts/genesis",
+                              "name":"genesis-volume-${CONSORTIUM_NAME}"
+                           },
+                           {
+                              "mountPath":"/opt/parity/mounts/reserved",
+                              "name":"consortium-reserved-peers-${CONSORTIUM_NAME}"
+                           }
+                        ]
+                     }
+                  ],
+                  "volumes":[
+                     {
+                        "name":"config-secondary-volume-${CONSORTIUM_NAME}",
+                        "configMap":{
+                           "defaultMode":420,
+                           "name":"${CONSORTIUM_NAME}-config-secondary"
+                        }
+                     },
+                     {
+                        "name":"genesis-volume-${CONSORTIUM_NAME}",
+                        "configMap":{
+                           "defaultMode":420,
+                           "name":"${CONSORTIUM_NAME}-consortium-genesis"
+                        }
+                     },
+                     {
+                        "name":"consortium-reserved-peers-${CONSORTIUM_NAME}",
+                        "configMap":{
+                           "defaultMode":420,
+                           "name":"${CONSORTIUM_NAME}-consortium-reserved-peers"
+                        }
+                     }
+                  ],
+                  "restartPolicy":"Always",
+                  "dnsPolicy":"ClusterFirst"
+               }
+            },
+            "replicas":"${REPLICA_COUNT}",
+            "selector":{
+               "name":"${CONSORTIUM_NAME}-secondary"
+            },
+            "triggers":[
+               {
+                  "type":"ConfigChange"
+               }
+            ],
+            "strategy":{
+               "type":"Recreate"
+            }
+         }
       },
       {
          "kind":"Route",
          "apiVersion":"v1",
          "metadata":{
-            "name":"${CONSORTIUM_NAME}-rpc",
+            "name":"${CONSORTIUM_NAME}-validator-rpc",
             "annotations":{
                "description":"Route for Parity JSON-RPC"
             }
          },
          "spec":{
-            "host":"${APPLICATION_HOSTNAME_RPC}",
+            "host":"${VALIDATOR_HOSTNAME_RPC}",
             "port":{
                "targetPort":"8545-tcp"
             },
@@ -204,13 +384,13 @@
          "kind":"Route",
          "apiVersion":"v1",
          "metadata":{
-            "name":"${CONSORTIUM_NAME}-ws",
+            "name":"${CONSORTIUM_NAME}-validator-ws",
             "annotations":{
-               "description":"Route for Parity Websocket"
+               "description":"Route for Validator Parity Websocket"
             }
          },
          "spec":{
-            "host":"${APPLICATION_HOSTNAME_WS}",
+            "host":"${VALIDATOR_HOSTNAME_WS}",
             "port":{
                "targetPort":"8546-tcp"
             },
@@ -220,6 +400,54 @@
             "to":{
                "kind":"Service",
                "name":"${CONSORTIUM_NAME}-validator-service",
+               "weight": 100
+            }
+         }
+      },
+      {
+         "kind":"Route",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-secondary-rpc",
+            "annotations":{
+               "description":"Route for Secondary Parity JSON-RPC"
+            }
+         },
+         "spec":{
+            "host":"${SECONDARY_HOSTNAME_RPC}",
+            "port":{
+               "targetPort":"8545-tcp"
+            },
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-secondary"
+            },
+            "to":{
+               "kind":"Service",
+               "name":"${CONSORTIUM_NAME}-secondary-service",
+               "weight": 100
+            }
+         }
+      },
+      {
+         "kind":"Route",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-secondary-ws",
+            "annotations":{
+               "description":"Route for Secondary-Parity Websocket"
+            }
+         },
+         "spec":{
+            "host":"${SECONDARY_HOSTNAME_WS}",
+            "port":{
+               "targetPort":"8546-tcp"
+            },
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-secondary"
+            },
+            "to":{
+               "kind":"Service",
+               "name":"${CONSORTIUM_NAME}-secondary-service",
                "weight": 100
             }
          }
@@ -242,10 +470,45 @@
                   "protocol":"TCP",
                   "port":8546,
                   "targetPort":8546
+               },{
+                  "name":"30301-udp",
+                  "protocol":"UDP",
+                  "port":30301,
+                  "targetPort":30301
                }
             ],
             "selector":{
                "deploymentconfig":"${CONSORTIUM_NAME}-validator"
+            }
+         }
+      },
+      {
+         "kind":"Service",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-secondary-service"
+         },
+         "spec":{
+            "ports":[
+               {
+                  "name":"8545-tcp",
+                  "protocol":"TCP",
+                  "port":8545,
+                  "targetPort":8545
+               },{
+                  "name":"8546-tcp",
+                  "protocol":"TCP",
+                  "port":8546,
+                  "targetPort":8546
+               },{
+                  "name":"30301-udp",
+                  "protocol":"UDP",
+                  "port":30301,
+                  "targetPort":30301
+               }
+            ],
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-secondary"
             }
          }
       },
@@ -256,7 +519,17 @@
             "name":"${CONSORTIUM_NAME}-config-validator"
          },
          "data":{
-            "config-validator.toml":"[parity]\nchain = \"/opt/parity/mounts/genesis/consortium-genesis.json\"\nbase_path = \"/opt/parity/data\"\n identity = \"${VALIDATOR_IDENTITY}\"\nlight = false\n\n[network]\nport = 30301\nmin_peers = 0\nmax_peers = 999\ndiscovery = true\nreserved_only = false\nreserved_peers = \"/opt/parity/mounts/reserved/peers.enodes\"\n\n[ui]\ndisable = true\n\n[dapps]\ndisable = true\n\n[secretstore]\ndisable = true\n\n[websockets]\ninterface = \"all\"\norigins = [\"all\"]\nhosts = [\"all\"]\napis = [\"all\"]\nport = 8546\n\n[rpc]\ninterface = \"all\"\nhosts = [\"all\"]\napis = [\"all\"]\ncors = [\"all\"]\nport = 8545\n\n\n[account]\npassword = [\"/opt/parity/mounts/pwds/validator.pwd\"]\n\n[mining]\n#engine_signer = \"${ENGINE_SIGNER}\"\n#reseal_on_txs = \"none\"\n\n"
+            "config-validator.toml":"[parity]\nchain = \"/opt/parity/mounts/genesis/consortium-genesis.json\"\nbase_path = \"/opt/parity/data\"\n identity = \"${VALIDATOR_IDENTITY}\"\nlight = false\n\n[network]\nport = 30301\nmin_peers = 0\nmax_peers = 999\ndiscovery = true\nreserved_only = false\nreserved_peers = \"/opt/parity/mounts/reserved/peers.enodes\"\n\n[ui]\ndisable = true\n\n[dapps]\ndisable = true\n\n[secretstore]\ndisable = true\n\n[websockets]\ninterface = \"all\"\norigins = [\"all\"]\nhosts = [\"all\"]\napis = [\"all\"]\nport = 8546\n\n[rpc]\ninterface = \"all\"\nhosts = [\"all\"]\napis = [\"all\"]\ncors = [\"all\"]\nport = 8545\n\n\n[account]\npassword = [\"/opt/parity/mounts/pwd/password\"]\n\n[mining]\nengine_signer = \"${ENGINE_SIGNER}\"\nreseal_on_txs = \"none\"\n\n"
+         }
+      },
+      {
+         "kind":"ConfigMap",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-config-secondary"
+         },
+         "data":{
+            "config-secondary.toml":"[parity]\nchain = \"/opt/parity/mounts/genesis/consortium-genesis.json\"\nbase_path = \"/opt/parity/data\"\n\nlight = false\n\n[network]\nport = 30301\nmin_peers = 0\nmax_peers = 999\ndiscovery = true\nreserved_only = false\nreserved_peers = \"/opt/parity/mounts/reserved/peers.enodes\"\n\n[ui]\ndisable = true\n\n[dapps]\ndisable = true\n\n[secretstore]\ndisable = true\n\n[websockets]\ninterface = \"all\"\norigins = [\"all\"]\nhosts = [\"all\"]\napis = [\"all\"]\nport = 8546\n\n[rpc]\ninterface = \"all\"\nhosts = [\"all\"]\napis = [\"all\"]\ncors = [\"all\"]\nport = 8545\n\n[footprint]\ntracing = \"on\"\npruning = \"archive\"\nfat_db = \"on\"\n"
          }
       },
       {
@@ -280,20 +553,30 @@
          }
       },
       {
-         "kind":"ConfigMap",
-         "apiVersion":"v1",
-         "metadata":{
-            "name":"${CONSORTIUM_NAME}-consortium-validator-pwd"
+         "apiVersion": "v1",
+         "kind": "Secret",
+         "metadata": {
+            "name": "${CONSORTIUM_NAME}-consortium-validator-key"
          },
-         "data":{
-            "validator.pwd":"c4 f0 44 33 46 4e c8 af cb 2a 71 46 e9 3a 25 fb\n"
+         "data": {
+            "key": "${VALIDATOR_KEY}"
+         }
+      },
+      {
+         "apiVersion": "v1",
+         "kind": "Secret",
+         "metadata": {
+            "name": "${CONSORTIUM_NAME}-consortium-validator-pwd"
+         },
+         "data": {
+            "password": "${VALIDATOR_KEY_PASSWORD}"
          }
       },
       {
          "kind":"ImageStream",
          "apiVersion":"v1",
          "metadata":{
-            "name":"${CONSORTIUM_NAME}"
+            "name":"${CONSORTIUM_NAME}-validator"
          },
          "spec":{
             "selector":{
@@ -304,7 +587,33 @@
             },
             "tags":[
                {
-                  "name":"1.9.5-centos",
+                  "name":"1.9.5-centos-validator",
+                  "from":{
+                     "kind":"DockerImage",
+                     "name":"dapowerplay/parity:1.9.5-centos"
+                  },
+                  "generation":2,
+                  "importPolicy":{}
+               }
+            ]
+         }
+      },
+      {
+         "kind":"ImageStream",
+         "apiVersion":"v1",
+         "metadata":{
+            "name":"${CONSORTIUM_NAME}-secondary"
+         },
+         "spec":{
+            "selector":{
+               "deploymentconfig":"${CONSORTIUM_NAME}-secondary"
+            },
+            "lookupPolicy":{
+               "local":false
+            },
+            "tags":[
+               {
+                  "name":"1.9.5-centos-secondary",
                   "from":{
                      "kind":"DockerImage",
                      "name":"dapowerplay/parity:1.9.5-centos"
@@ -316,5 +625,5 @@
          }
       }
    ],
-   "message" : "Congrats! ${CONSORTIUM_NAME} is starting."
+   "message" : "Congrats! ${CONSORTIUM_NAME} is starting.\nFor more information about using this template, see https://github.com/dapowerplay/parity-openshift/"
 }
