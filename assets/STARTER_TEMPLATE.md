@@ -2,7 +2,7 @@
 
 # A starting point for PoA networks on Ethereum via Openshift
 
-Template contains 1 Validator (Authority) Node, 3 load balanced, fatDB enabled, Secondary nodes, 1 Block explorer
+Template contains 1 Validator (authority) ethereum node, 3 load balanced, fatDB enabled, Secondary ethereum nodes, 1 Block explorer
 
 The persistent (1gb default) Validator node will automatically start to produce blocks.
 
