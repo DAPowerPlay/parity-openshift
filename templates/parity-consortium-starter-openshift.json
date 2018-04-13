@@ -201,6 +201,10 @@
                            {
                               "mountPath": "/opt/parity/mounts/pwd",
                               "name": "${CONSORTIUM_NAME}-secret-volume-pwd"
+                           }, 
+                           {
+                              "mountPath": "/opt/parity/data/network",
+                              "name": "consortium-validator-network-key-${CONSORTIUM_NAME}"
                            }
                         ]
                      }
@@ -241,6 +245,11 @@
                         "name": "${CONSORTIUM_NAME}-secret-volume-pwd",
                         "secret": {
                            "secretName": "${CONSORTIUM_NAME}-consortium-validator-pwd"
+                        }
+                     },{
+                        "name": "consortium-validator-network-key-${CONSORTIUM_NAME}",
+                        "secret": {
+                           "secretName": "${CONSORTIUM_NAME}-consortium-validator-network-key"
                         }
                      }
                   ],
@@ -661,7 +670,7 @@
             "name":"${CONSORTIUM_NAME}-consortium-reserved-peers"
          },
          "data":{
-            "peers.enodes":"\n"
+            "peers.enodes":"enode://e7e74ceadc76fc96aba7f5746be97810bd936739d773e01c844dacc36dfa83b166a6e74d5b011ed16cc4a1da07ce928f27cc740a07b05ec453e81c39f645c6b2@${CONSORTIUM_NAME}-validator-service:30301\n"
          }
       },{
          "apiVersion": "v1",
@@ -673,6 +682,16 @@
             "key": "${VALIDATOR_KEY}"
          }
       },{
+         "apiVersion": "v1",
+         "kind": "Secret",
+         "metadata": {
+            "name": "${CONSORTIUM_NAME}-consortium-validator-network-key"
+         },
+         "data": {
+            "key": "ZDMwZWJkYzk5NWU0ZmY2MjAzYTdiMzMxNTE4ZDJlNjlmOGQ1NzQ4MGY0NWU1NDUxZWRmNTNlNTQ2OTdmYTY5Ng=="
+         }
+      }
+      ,{
          "apiVersion": "v1",
          "kind": "ConfigMap",
          "metadata": {
@@ -744,6 +763,7 @@
             ]
          }
       },
+
       {
          "kind":"ImageStream",
          "apiVersion":"v1",
