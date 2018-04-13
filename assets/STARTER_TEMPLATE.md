@@ -15,9 +15,6 @@ Block explorer requests are load-balanced across the three secondary nodes.
 ![alt text][r3]
 
 
-[r1]: images/consortium-starter-1.png "Yay!"
-[r2]: images/consortium-starter-2.png "Yay! x3"
-[r2]: images/consortium-starter-3.png "Yay!"
-[tag]: 	https://img.shields.io/github/tag/dapowerplay/openshift-parity.svg
-[license]: https://img.shields.io/github/license/dapowerplay/openshift-parity.svg
-[dockerpulls]: https://img.shields.io/docker/pulls/dapowerplay/parity.svg
+[r1]: images/consortium-starter-1.png ""
+[r2]: images/consortium-starter-2.png ""
+[r3]: images/consortium-starter-3.png ""
