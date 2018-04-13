@@ -21,14 +21,14 @@
          "name":"CONSORTIUM_NAME",
          "displayName":"A name for this consortium",
          "description":"Give this consortium a name. No spaces, only lowercase letters or numbers or -.",
-         "value":"consortium-dpp-alpha",
+         "value":"consortium-e",
          "required":true
       },
       {
          "name":"NETWORK_ID",
          "displayName":"Network id",
          "description":"Defines the id of your private ethereum network",
-         "value":"0xfafadeadbeef",
+         "value":"0xeeeeeeeed",
          "required":true   
       },
       {
