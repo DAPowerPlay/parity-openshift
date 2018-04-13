@@ -1,6 +1,6 @@
 ### OpenShift Consortium starter 
 
-# A starting point for PoA networks on Ethereum via Openshift
+# A starting point for custom Parity Ethereum networks via Openshift 
 
 Template contains 1 Validator (authority) ethereum node, 3 load balanced, fatDB enabled, Secondary ethereum nodes, 1 Block explorer
 
