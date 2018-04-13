@@ -1,4 +1,4 @@
-### OpenShift Consortium starter 
+### OpenShift Blockhain Consortium starter 
 
 # A starting point for custom Parity Ethereum networks via Openshift 
 
