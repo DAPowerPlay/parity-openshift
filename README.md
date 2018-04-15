@@ -12,10 +12,10 @@ Run a Parity Ethereum node on OpenShift for free in just a few clicks:
 
 1) If you don't have your OpenShift instance, register an account on RedHats [OpenShift Online](https://manage.openshift.com/), or install [Minishift](https://github.com/minishift/minishift)
 
-2) Pick a template
+2) Pick a template:
  
  - [Parity (Ephemeral)](/templates/parity-openshift-ephemeral.json)
- Ideal for just trying things out, spawns one Parity ethereum node. [Guidelines here,](/assets/GUIWAY.md)
+ Ideal for just trying things out, spawns one Parity ethereum node. [Guidelines here.](/assets/GUIWAY.md)
 
 
  - [OpenShift Blockhain Consortium starter](/templates/parity-consortium-starter-openshift.json)
