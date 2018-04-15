@@ -1,6 +1,6 @@
 ### OpenShift Blockhain Consortium starter 
 
-# A starting point for custom Parity Ethereum networks via Openshift 
+# A starting point for custom Parity Ethereum networks via OpenShift 
 
 Template contains 1 Validator (authority) ethereum node, 3 load balanced, fatDB enabled, Secondary ethereum nodes, 1 Block explorer
 
