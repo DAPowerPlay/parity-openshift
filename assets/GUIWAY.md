@@ -1,5 +1,7 @@
 ### OpenShift template - The GUI Way
 
+Run a Parity Ethereum node on OpenShift for free in just a few clicks:
+
 If you don't have your OpenShift instance, register an account on RedHats [OpenShift Online](https://manage.openshift.com/).
 
 
@@ -39,6 +41,3 @@ If you don't have your OpenShift instance, register an account on RedHats [OpenS
 [r4]: images/readme-4.png "Just click Create"
 [r5]: images/readme-5.png "Yay!"
 [r6]: images/readme-6.png "Yay! x2"
-[tag]: 	https://img.shields.io/github/tag/dapowerplay/openshift-parity.svg
-[license]: https://img.shields.io/github/license/dapowerplay/openshift-parity.svg
-[dockerpulls]: https://img.shields.io/docker/pulls/dapowerplay/parity.svg
