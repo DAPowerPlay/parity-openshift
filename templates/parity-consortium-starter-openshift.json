@@ -77,14 +77,14 @@
          "displayName": "Secondary Memory Limit",
          "name": "SECONDARY_MEMORY_LIMIT",
          "required": true,
-         "value": "512Mi"
+         "value": "256Mi"
       },
       {
          "description": "Maximum amount of memory the Validator container can use.",
          "displayName": "Validator Memory Limit",
          "name": "VALIDATOR_MEMORY_LIMIT",
          "required": true,
-         "value": "512Mi"
+         "value": "256Mi"
       },
       {
          "description": "Base64 encoded keystore password for the validator account, will be stored as a secret.",
@@ -174,7 +174,12 @@
                         ],
                         "resources": {
                            "limits": {
-                              "memory": "${VALIDATOR_MEMORY_LIMIT}"
+                              "memory": "${SECONDARY_MEMORY_LIMIT}",
+                              "cpu" : "100m"
+                           },
+                           "requests:": {
+                              "memory": "${SECONDARY_MEMORY_LIMIT}",
+                              "cpu" : "100m"
                            }
                         },
                         "volumeMounts":[
@@ -305,7 +310,12 @@
                         ],
                         "resources": {
                            "limits": {
-                              "memory": "${SECONDARY_MEMORY_LIMIT}"
+                              "memory": "${SECONDARY_MEMORY_LIMIT}",
+                              "cpu" : "100m"
+                           },
+                           "requests:": {
+                              "memory": "${SECONDARY_MEMORY_LIMIT}",
+                              "cpu" : "100m"
                            }
                         },
                         "volumeMounts":[
@@ -396,7 +406,15 @@
                               "value": "http://${CONSORTIUM_NAME}-secondary-service:8545"
                            }
                         ],
-                        "resources": {
+                       "resources": {
+                           "limits": {
+                              "memory": "${SECONDARY_MEMORY_LIMIT}",
+                              "cpu" : "100m"
+                           },
+                           "requests:": {
+                              "memory": "${SECONDARY_MEMORY_LIMIT}",
+                              "cpu" : "100m"
+                           }
                         },
                         "volumeMounts":[
                            {
