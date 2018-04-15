@@ -2,6 +2,8 @@
 
 # A starting point for custom Parity Ethereum networks via OpenShift 
 
+![alt text][r4]
+
 Template contains 1 Validator (authority) ethereum node, 3 load balanced, fatDB enabled, Secondary ethereum nodes, 1 Block explorer
 
 The persistent (1gb default) Validator node will automatically start to produce blocks.
@@ -14,7 +16,10 @@ Block explorer requests are load-balanced across the three secondary nodes.
 ![alt text][r2]
 ![alt text][r3]
 
+Happy Coding! :fire:          :fire_engine:
+
 
 [r1]: images/consortium-starter-1.png ""
 [r2]: images/consortium-starter-2.png ""
 [r3]: images/consortium-starter-3.png ""
+[r4]: images/starter-drawio.png ""
