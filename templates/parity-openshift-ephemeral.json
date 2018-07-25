@@ -67,7 +67,7 @@
                   "containers":[
                      {
                         "name":"${APPLICATION_NAME}",
-                        "image":"dapowerplay/parity:1.9.5-centos",
+                        "image":"dapowerplay/parity:1.11.7-centos",
                         "args":[
                            "--config",
                            "${BASE_PATH}/mounts/config/config.toml"
@@ -183,10 +183,10 @@
             },
             "tags":[
                {
-                  "name":"1.9.5-centos",
+                  "name":"1.11.7-centos",
                   "from":{
                      "kind":"DockerImage",
-                     "name":"dapowerplay/parity:1.9.5-centos"
+                     "name":"dapowerplay/parity:1.11.7-centos"
                   },
                   "generation":2,
                   "importPolicy":{}

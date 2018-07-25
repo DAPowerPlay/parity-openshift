@@ -152,7 +152,7 @@
                   "containers":[
                      {
                         "name":"${CONSORTIUM_NAME}-validator-container",
-                        "image":"dapowerplay/parity:1.9.5-centos",
+                        "image":"dapowerplay/parity:1.11.7-centos",
                         "args":[
                            "--config",
                            "/opt/parity/mounts/config/config-validator.toml"
@@ -292,7 +292,7 @@
                   "containers":[
                      {
                         "name":"${CONSORTIUM_NAME}-secondary-container",
-                        "image":"dapowerplay/parity:1.9.5-centos",
+                        "image":"dapowerplay/parity:1.11.7-centos",
                         "args":[
                            "--config",
                            "/opt/parity/mounts/config/config-secondary.toml"
@@ -744,10 +744,10 @@
             },
             "tags":[
                {
-                  "name":"1.9.5-centos-validator",
+                  "name":"1.11.7-centos-validator",
                   "from":{
                      "kind":"DockerImage",
-                     "name":"dapowerplay/parity:1.9.5-centos"
+                     "name":"dapowerplay/parity:1.11.7-centos"
                   },
                   "generation":2,
                   "importPolicy":{}
@@ -770,10 +770,10 @@
             },
             "tags":[
                {
-                  "name":"1.9.5-centos-secondary",
+                  "name":"1.11.7-centos-secondary",
                   "from":{
                      "kind":"DockerImage",
-                     "name":"dapowerplay/parity:1.9.5-centos"
+                     "name":"dapowerplay/1.11.7-centos"
                   },
                   "generation":2,
                   "importPolicy":{}
